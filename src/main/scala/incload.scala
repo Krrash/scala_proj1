@@ -25,7 +25,7 @@ object IncrementalLoad {
       df.show()
 
       // Read existing data from Hive table
-      val existing_hive_data = spark.read.table("kaushal.kaggle")
+      val existing_hive_data = spark.read.table("kaushal.sparkduplicate")
       existing_hive_data.show(5)
 
 
@@ -41,14 +41,14 @@ object IncrementalLoad {
 
       // Append incremental_data_df to the existing Hive table if there are new records
       if (new_records > 0) {
-        incremental_data_df.write.mode("append").saveAsTable("kaushal.kaggle")
+        incremental_data_df.write.mode("append").saveAsTable("kaushal.sparkduplicate")
         println("New records appended to Hive table.")
       } else {
         println("No new records appended to Hive table.")
       }
 
       // Read updated data from Hive table and display ordered by id descending
-      val updated_hive_data = spark.read.table("kaushal.kaggle")
+      val updated_hive_data = spark.read.table("kaushal.sparkduplicate")
       val df_ordered = updated_hive_data.orderBy(col("id").desc_nulls_last)
       println("Updated Hive table:")
       df_ordered.show(5)
