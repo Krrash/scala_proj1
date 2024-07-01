@@ -1,7 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.11.12"
-libraryDependencies += "org.scalatest" %% "scalatest" % "4" % Test
 
 lazy val root = (project in file("."))
   .settings(
