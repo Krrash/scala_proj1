@@ -14,7 +14,7 @@ object IncrementalLoad {
       // Read data from PostgreSQL table
       val df = spark.read.format("jdbc")
         .option("url", "jdbc:postgresql://ec2-3-9-191-104.eu-west-2.compute.amazonaws.com:5432/testdb")
-        .option("dbtable", "bank")
+        .option("dbtable", "kaggle_kaushal")
         .option("driver", "org.postgresql.Driver")
         .option("user", "consultants")
         .option("password", "WelcomeItc@2022")
@@ -25,15 +25,12 @@ object IncrementalLoad {
       df.show()
 
       // Read existing data from Hive table
-      val existing_hive_data = spark.read.table("tekle.bank_marketing_scala")
+      val existing_hive_data = spark.read.table("kaushal.kaggle")
       existing_hive_data.show(5)
 
-      // Handle null values in 'job' column before transforming
-      val dfFiltered = df.withColumn("job_upper", when(col("job").isNull, lit(null)).otherwise(upper(col("job"))))
-      dfFiltered.show(5)
 
       // Determine incremental data using left_anti join
-      val incremental_data_df = dfFiltered.join(existing_hive_data, Seq("id"), "left_anti")
+      val incremental_data_df = df.join(existing_hive_data, Seq("id"), "left_anti")
       println("------------------Incremental data-----------------------")
       incremental_data_df.show()
 
@@ -44,14 +41,14 @@ object IncrementalLoad {
 
       // Append incremental_data_df to the existing Hive table if there are new records
       if (new_records > 0) {
-        incremental_data_df.write.mode("append").saveAsTable("tekle.bank_marketing_scala")
+        incremental_data_df.write.mode("append").saveAsTable("kaushal.kaggle")
         println("New records appended to Hive table.")
       } else {
         println("No new records appended to Hive table.")
       }
 
       // Read updated data from Hive table and display ordered by id descending
-      val updated_hive_data = spark.read.table("tekle.bank_marketing_scala")
+      val updated_hive_data = spark.read.table("kaushal.kaggle")
       val df_ordered = updated_hive_data.orderBy(col("id").desc_nulls_last)
       println("Updated Hive table:")
       df_ordered.show(5)
